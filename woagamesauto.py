@@ -17,7 +17,7 @@ COLUMNS = {
     "publisher": "Publisher",
     "compatibility": "Compatibility",
     "device_configuration": r"Device Configuration eg Snapdragon X Elite - 32 GB",
-    "date_tested": "Date Tested",
+    "date_tested": "Date tested1",
     "os_version": "OS Version",
     "driver_id": "Driver ID",
     "compatibility_details": "Compatibility Details",
@@ -32,9 +32,22 @@ def format_game_name(game_name):
 # Utility function to handle NaN values
 def handle_nan(value):
     return "" if pd.isna(value) else value
+
+# Utility function to format date to YYYY-MM-DD
+def format_date(date_value):
+    try:
+        return pd.to_datetime(date_value).strftime('%Y-%m-%d')
+    except Exception:
+        return ""
+# Function to save data to a dictionary
 # Function to save data to a dictionary
 def save_row_data(row):
-    return {key: handle_nan(row[COLUMNS[key]]) for key in COLUMNS}
+    row_data = {key: handle_nan(row[COLUMNS[key]]) for key in COLUMNS}
+    # Format the date_tested field
+    row_data["date_tested"] = format_date(row_data["date_tested"])
+    # Format the compatibility field to lowercase and only take the part before the first space
+    row_data["compatibility"] = row_data["compatibility"].split(' ')[0].lower()
+    return row_data
 
 # Function to find matching game files
 def find_matching_files(game_name, folder):
