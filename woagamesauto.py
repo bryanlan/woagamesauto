@@ -25,9 +25,10 @@ COLUMNS = {
     "auto_super_res_fps_boost": "Auto Super Res FPS boost",
     "reporter": "Your name/gamertag"
 }
+
 # Utility function to format game name
 def format_game_name(game_name):
-    return game_name.lower().replace(' ', '_').replace(':', '')
+    return game_name.lower().replace(' ', '_').replace(':', '').replace('.','')
 
 # Utility function to handle NaN values
 def handle_nan(value):
@@ -39,7 +40,8 @@ def format_date(date_value):
         return pd.to_datetime(date_value).strftime('%Y-%m-%d')
     except Exception:
         return ""
-# Function to save data to a dictionary
+    
+
 # Function to save data to a dictionary
 def save_row_data(row):
     row_data = {key: handle_nan(row[COLUMNS[key]]) for key in COLUMNS}
@@ -47,6 +49,15 @@ def save_row_data(row):
     row_data["date_tested"] = format_date(row_data["date_tested"])
     # Format the compatibility field to lowercase and only take the part before the first space
     row_data["compatibility"] = row_data["compatibility"].split(' ')[0].lower()
+
+    # Format categories to have no spaces and to be lowercase
+    row_data["categories"] = row_data["categories"].replace(' ','').lower()
+
+    # Format compatability details to remove any new lines, and add in literals for quotations
+    row_data["compatibility_details"] = row_data["compatibility_details"].replace('"','\\"').rstrip('\n')
+
+    # Format auto super resolution compatibility to lower case
+    row_data["auto_super_resolution_compatibility"] = row_data["auto_super_resolution_compatibility"].lower().replace(';','')
     return row_data
 
 # Function to find matching game files
