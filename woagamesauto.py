@@ -8,7 +8,6 @@ SOURCE_GAME_FOLDER = r'C:\Users\blangl\vs code projects\woasubmit\works-on-woa\s
 SOURCE_USER_REPORTS_FOLDER = r'C:\Users\blangl\vs code projects\woasubmit\works-on-woa\src\content\user_reports_games'
 PROCESSED_COLUMN_NAME = 'Processed'
 
-# Column names mapping
 COLUMNS = {
     "email": "Email",
     "name": "Name",
@@ -16,8 +15,8 @@ COLUMNS = {
     "categories": "Categories",
     "publisher": "Publisher",
     "compatibility": "Compatibility",
-    "device_configuration": r"Device Configuration eg Snapdragon X Elite - 32 GB",
-    "date_tested": "Date tested1",
+    "device_configuration": "Device Configuration",
+    "date_tested": "Date tested",
     "os_version": "OS Version",
     "driver_id": "Driver ID",
     "compatibility_details": "Compatibility Details",
@@ -25,7 +24,6 @@ COLUMNS = {
     "auto_super_res_fps_boost": "Auto Super Res FPS boost",
     "reporter": "Your name/gamertag"
 }
-
 # Utility function to format game name
 def format_game_name(game_name):
     return game_name.lower().replace(' ', '_').replace(':', '').replace('.','')
@@ -42,6 +40,7 @@ def format_date(date_value):
         return ""
     
 
+# Function to save data to a dictionary
 # Function to save data to a dictionary
 def save_row_data(row):
     row_data = {key: handle_nan(row[COLUMNS[key]]) for key in COLUMNS}
@@ -152,14 +151,19 @@ def main():
         print(f"Error reading the CSV file: {e}")
         return
 
+    print(df.head())
+    for col in df.columns:
+        print(col)
+
     # Get all unprocessed rows
-    unprocessed_rows = df[df[PROCESSED_COLUMN_NAME].isnull()]
+    unprocessed_rows = df
 
     index = 0
     while index < len(unprocessed_rows):
         row = unprocessed_rows.iloc[index]
         game_data = save_row_data(row)
         game_name = game_data["game_name"]
+        print(game_name)
 
         # Check for additional compatibility data in subsequent rows
         additional_compatibility_data = []
