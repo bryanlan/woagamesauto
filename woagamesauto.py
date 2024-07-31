@@ -8,7 +8,6 @@ SOURCE_GAME_FOLDER = r'C:\Users\blangl\vs code projects\woasubmit\works-on-woa\s
 SOURCE_USER_REPORTS_FOLDER = r'C:\Users\blangl\vs code projects\woasubmit\works-on-woa\src\content\user_reports_games'
 PROCESSED_COLUMN_NAME = 'Processed'
 
-# Column names mapping
 COLUMNS = {
     "email": "Email",
     "name": "Name",
@@ -16,8 +15,8 @@ COLUMNS = {
     "categories": "Categories",
     "publisher": "Publisher",
     "compatibility": "Compatibility",
-    "device_configuration": r"Device Configuration eg Snapdragon X Elite - 32 GB",
-    "date_tested": "Date tested1",
+    "device_configuration": "Device Configuration",
+    "date_tested": "Date tested",
     "os_version": "OS Version",
     "driver_id": "Driver ID",
     "compatibility_details": "Compatibility Details",
@@ -27,7 +26,7 @@ COLUMNS = {
 }
 # Utility function to format game name
 def format_game_name(game_name):
-    return game_name.lower().replace(' ', '_').replace(':', '')
+    return game_name.lower().replace(' ', '_').replace(':', '').replace('.','')
 
 # Utility function to handle NaN values
 def handle_nan(value):
@@ -39,6 +38,8 @@ def format_date(date_value):
         return pd.to_datetime(date_value).strftime('%Y-%m-%d')
     except Exception:
         return ""
+    
+
 # Function to save data to a dictionary
 # Function to save data to a dictionary
 def save_row_data(row):
@@ -47,6 +48,15 @@ def save_row_data(row):
     row_data["date_tested"] = format_date(row_data["date_tested"])
     # Format the compatibility field to lowercase and only take the part before the first space
     row_data["compatibility"] = row_data["compatibility"].split(' ')[0].lower()
+
+    # Format categories to have no spaces and to be lowercase
+    row_data["categories"] = row_data["categories"].replace(' ','').lower()
+
+    # Format compatability details to remove any new lines, and add in literals for quotations
+    row_data["compatibility_details"] = row_data["compatibility_details"].replace('"','\\"').rstrip('\n')
+
+    # Format auto super resolution compatibility to lower case
+    row_data["auto_super_resolution_compatibility"] = row_data["auto_super_resolution_compatibility"].lower().replace(';','')
     return row_data
 
 # Function to find matching game files
@@ -141,14 +151,19 @@ def main():
         print(f"Error reading the CSV file: {e}")
         return
 
+    print(df.head())
+    for col in df.columns:
+        print(col)
+
     # Get all unprocessed rows
-    unprocessed_rows = df[df[PROCESSED_COLUMN_NAME].isnull()]
+    unprocessed_rows = df
 
     index = 0
     while index < len(unprocessed_rows):
         row = unprocessed_rows.iloc[index]
         game_data = save_row_data(row)
         game_name = game_data["game_name"]
+        print(game_name)
 
         # Check for additional compatibility data in subsequent rows
         additional_compatibility_data = []
